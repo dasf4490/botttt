@@ -1,8 +1,17 @@
 import os
+import discord
 from discord.ext import commands
-from utils.ai_handler import analyze_message
 
-bot = commands.Bot(command_prefix="!")
+# 必要なintentsを初期化
+intents = discord.Intents.default()
+intents.messages = True
+intents.guilds = True
+
+# 環境変数からトークンを取得
+discord_token = os.getenv("DISCORD_BOT_TOKEN")
+
+# Botを初期化
+bot = commands.Bot(command_prefix="!", intents=intents)
 
 @bot.event
 async def on_ready():
@@ -11,12 +20,11 @@ async def on_ready():
 @bot.event
 async def on_message(message):
     if message.author.bot:
-        return
-    
-    # AIハンドラーを呼び出して結果を取得
-    is_inappropriate = analyze_message(message.content)
-    if is_inappropriate:
-        await message.delete()
-        await message.channel.send(f"{message.author.mention} 不適切な発言が検出されたため、メッセージを削除しました。")
+        return  # ボットのメッセージを無視
 
-bot.run(os.getenv("DISCORD_BOT_TOKEN"))
+    # 簡単な動作確認用
+    if "hello" in message.content.lower():
+        await message.channel.send("Hello! How can I assist you?")
+
+# Botを起動
+bot.run(discord_token)
